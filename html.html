@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MEDNAVIGUIDE</title>
+    
+</head>
+<body id="wrapper">
+    <div">
+        <br><br><br><br><br>
+        <p style="text-indent: 120px; color: gray; font-size: 30px;">MEDNAVIGUIDE</p>
+
+        <p style="text-indent: 120px; color: white; font-size: 100px; margin-top: 20px;">Your trusted</p>
+        <p style="text-indent: 120px; color: white; font-size: 100px; margin-top: -120px;">Healthcare guide</p>
+        <p class="subtext" style="margin-top: -90px;">Personalized guidance from experienced healthcare advocates</p>
+        <p class="subtext"style="margin-top: -45px;">focused on connecting you with Singapore's premier care network.</p>
+        <br><br><br>
+        <p style="text-indent: 120px; color: white; font-size: 30px;">✅ 15+ Years Clinical Experience</p>
+        <p style="text-indent: 120px; color: white; font-size: 30px;">✅ Certified Patient Advocacy</p>
+        <p style="text-indent: 120px; color: white; font-size: 30px;">✅ Vetted Singapore Medical Network</p>
+        <p style="text-indent: 120px; color: white; font-size: 30px;">✅ Rapid & Secure Service Finder</p>
+        <script src="https://elfsightcdn.com/platform.js" async></script>
+        <div class="elfsight-app-cc85d0a3-9ceb-4910-8313-9173d943393d" data-elfsight-app-lazy></div>
+        <br><br><br><br>
+        <button class="button">Start Finding<br>Care</button>
+    </div>
+    <!-- Elfsight AI Chatbot | Mednavi -->
+
+    <div class="wrapper">
+        <h1 style="color: white; text-align: center; margin-top: 50px;">Under Progress</h1>
+        <h1 style="color: white; text-align: center; margin-top: 50px;">Find Care Near You</h1>
+        <input type="text" id="myInput" onkeyup="searchFunction()" placeholder="Search for locations.." style="margin-left: 740px; padding: 10px; font-size: 20px; width: 300px;">
+    </div>
+    
+</body>
+</html>
+
+<style>
+    #wrapper {
+        width: 1800px; /* Set your desired fixed width */
+        margin: 0 auto; /* Centers the container */
+        background-color: white; /* Optional: makes the content area visible */
+        background-color: rgb(51, 50, 50);
+        animation: slideUp 2s ease-out forwards;
+    }
+    .subtext {
+        color: rgb(151, 148, 148);
+        font-size: 35px;
+        text-indent: 120px;
+        
+    }
+    .button {
+        margin-left: 120px;
+        padding: 30px 70px;
+        font-size: 35px;
+        background-color: #F7F5F2;
+        color: #333;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+    }
+    button:hover {
+        text-decoration: underline;
+    }
+    .overlay {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 100%;
+        width: 100%;
+        opacity: 0;
+        transition: .5s ease;
+        background-color: rgba(0,0,0,0.5); /* Black semi-transparent */
+    }
+    
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(50px); /* Starts 50px lower */
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);    /* Moves to original position */
+        }
+    }
+
+    .page-break {
+        page-break-after: always;
+    }
+    
+</style>
+
+
+<script>
+    function searchFunction() {
+  let input = document.getElementById('myInput').value.toUpperCase();
+  let ul = document.getElementById("locationList");
+  let li = ul.getElementsByTagName('li');
+
+  for (let i = 0; i < li.length; i++) {
+    let textValue = li[i].textContent || li[i].innerText;
+    if (textValue.toUpperCase().indexOf(input) > -1) {
+      li[i].style.display = "";
+    } else {
+      li[i].style.display = "none";
+    }
+  }
+}
