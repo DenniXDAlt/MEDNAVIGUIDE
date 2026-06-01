@@ -200,8 +200,6 @@
                         <option value="gp">GP Clinic</option>
                         <option value="polyclinic">Polyclinic</option>
                         <option value="pharmacy">Pharmacy</option>
-                        <option value="hospital">Hospital</option>
-                        <option value="tcm">TCM</option>
                         <option value="specialist">Specialist</option>
                     </select>
 
@@ -273,8 +271,6 @@
                     <option>GP Clinic</option>
                     <option>Polyclinic</option>
                     <option>Pharmacy</option>
-                    <option>Hospital</option>
-                    <option>TCM</option>
                     <option>Specialist</option>
                     <option>Other</option>
                 </select>
@@ -381,8 +377,6 @@
                 if (typeQ === "gp" && !type.includes("gp") && !type.includes("clinic") && !type.includes("medical")) return false;
                 if (typeQ === "polyclinic" && !type.includes("polyclinic")) return false;
                 if (typeQ === "pharmacy" && !type.includes("pharmacy") && !type.includes("retail") && !type.includes("compounding")) return false;
-                if (typeQ === "hospital" && !type.includes("hospital")) return false;
-                if (typeQ === "tcm" && !type.includes("tcm")) return false;
                 if (typeQ === "specialist" && !type.includes("specialist") && !type.includes("opc") && !type.includes("specialist")) return false;
             }
 
