@@ -161,7 +161,7 @@
 <body id="wrapper">
 
     <!-- Hero Content -->
-    <p class="hero-main" style="padding-left:5%;">Mednaviguide</p>
+    <p class="hero-main" style="padding-left:5%;">MedNaviGuide</p>
 
     <div class="how-it-works">
         <p>How to use the website: choose a region or service type, type a clinic or area name, and press Search. The table updates with matching care locations and useful details.</p>
@@ -477,19 +477,11 @@
     }
 
     function submitFeedback() {
-        const name = document.getElementById("fb-name").value.trim() || "Anonymous";
-        const clinic = document.getElementById("fb-clinic").value.trim();
-        const region = document.getElementById("fb-region").value;
-        const category = document.getElementById("fb-category").value;
         const text = document.getElementById("fb-text").value.trim();
 
-        if (!clinic) { alert("Please enter a clinic name."); return; }
         if (!text) { alert("Please write your feedback."); return; }
-        if (!selectedRating) { alert("Please select a rating."); return; }
 
         const review = {
-            name, clinic, region, category,
-            rating: selectedRating,
             text,
             date: new Date().toLocaleDateString("en-SG", {year:"numeric",month:"short",day:"numeric"})
         };
@@ -506,13 +498,7 @@
 
         setTimeout(() => {
             // Reset form
-            document.getElementById("fb-name").value = "";
-            document.getElementById("fb-clinic").value = "";
-            document.getElementById("fb-region").value = "";
-            document.getElementById("fb-category").value = "";
             document.getElementById("fb-text").value = "";
-            setRating(0);
-            selectedRating = 0;
             document.getElementById("feedbackForm").style.opacity = "1";
             success.style.display = "none";
             renderReviews();
@@ -528,14 +514,9 @@
             return;
         }
 
-        list.innerHTML = "<h3 style=\"font-size:18px;color:#F7C7AC;margin-bottom:15px;\">Community Reviews</h3>" +
+        list.innerHTML = "<h3 style=\"font-size:18px;color:#F7C7AC;margin-bottom:15px;\">Community Feedback</h3>" +
             reviews.map(r => `
             <div class="review-card">
-                <div class="review-header">
-                    <span class="review-name">${escapeHtml(r.name)}</span>
-                    <span class="review-stars">${"★".repeat(r.rating)}${"☆".repeat(5 - r.rating)}</span>
-                </div>
-                <div class="review-clinic">📍 ${escapeHtml(r.clinic)}${r.region ? ` · ${r.region}` : ""}${r.category ? ` · ${r.category}` : ""}</div>
                 <div class="review-text">${escapeHtml(r.text)}</div>
                 <div class="review-date">${r.date}</div>
             </div>`).join("");
