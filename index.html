@@ -13,7 +13,9 @@
         /* Hero Content */
         .hero-main { font-size: clamp(40px, 8vw, 100px); font-weight: bold; padding-left: 5%; margin-top: 50px; }
         .subtext { color: rgb(151, 148, 148); font-size: clamp(18px, 3vw, 30px); padding-left: 5%; }
-        .features-list { margin-top: 30px; padding-left: 5%; font-size: clamp(16px, 2.5vw, 24px); }
+        .features-list { margin-top: 30px; padding-left: 5%; max-width: 900px; font-size: clamp(16px, 2.5vw, 24px); line-height: 1.6; }
+        .how-it-works { margin-top: 20px; padding-left: 5%; max-width: 900px; font-size: clamp(16px, 2.2vw, 22px); line-height: 1.6; color: #ccc; }
+        .how-it-works p { margin-top: 12px; color: #ccc; }
 
         /* Search Section */
         .search-container { text-align: center; margin-top: 50px; background: rgba(255, 255, 255, 0.05); padding: 30px; border-radius: 15px; }
@@ -159,25 +161,17 @@
 <body id="wrapper">
 
     <!-- Hero Content -->
-    <p class="hero-title">MEDNAVIGUIDE</p>
-    <p class="hero-main">Your trusted</p>
-    <p class="hero-main" style="color: #918e8b; margin-top: -10px;">Healthcare guide</p>
+    <p class="hero-main" style="padding-left:5%;">Mednaviguide</p>
 
-    <p class="subtext">Personalized guidance from experienced healthcare advocates</p>
-    <p class="subtext" style="margin-top: 0;">focused on connecting you with Singapore's premier care network.</p>
-
-    <div class="features-list">
-        <p>✅ 15+ Years Clinical Experience</p>
-        <p>✅ Certified Patient Advocacy</p>
-        <p>✅ Vetted Singapore Medical Network</p>
-        <p>✅ Rapid &amp; Secure Service Finder</p>
+    <div class="how-it-works">
+        <p>How to use the website: choose a region or service type, type a clinic or area name, and press Search. The table updates with matching care locations and useful details.</p>
     </div>
 
     <!-- Navigation Tabs -->
     <div class="nav-tabs">
-        <button class="tab-btn active" onclick="switchTab('search')">🔍 Find Care</button>
-        <button class="tab-btn" onclick="switchTab('map')">🗺️ Map View</button>
-        <button class="tab-btn" onclick="switchTab('feedback')">💬 Feedback</button>
+        <button class="tab-btn active" onclick="switchTab(event,'search')">🔍 Find Care</button>
+        <button class="tab-btn" onclick="switchTab(event,'map')">🗺️ Map View</button>
+        <button class="tab-btn" onclick="switchTab(event,'feedback')">💬 Feedback</button>
     </div>
 
     <!-- SEARCH TAB -->
@@ -200,7 +194,8 @@
                         <option value="gp">GP Clinic</option>
                         <option value="polyclinic">Polyclinic</option>
                         <option value="pharmacy">Pharmacy</option>
-                        <option value="specialist">Specialist</option>
+                        <option value="public hospital (a&e)">Public Hospital (A&E)</option>
+                        <option value="private hospital (a&e)">Private Hospital (A&E)</option>
                     </select>
 
                     <input type="text" id="areaInput" placeholder="Area or clinic name..." onkeydown="if(event.key==='Enter')searchClinics()">
@@ -235,8 +230,8 @@
             <div style="text-align:center;">
                 <iframe
                     src="https://www.google.com/maps/d/embed?mid=1JJ71qnUF1vfGhQZGkkZufQ1ZHq0gfZM&ehbc=2E312F"
-                    width="100%" height="500"
-                    style="border:0; border-radius:10px; max-width:900px;"
+                    width="640" height="480"
+                    style="border:0; border-radius:10px; max-width:100%;"
                     allowfullscreen="" loading="lazy">
                 </iframe>
             </div>
@@ -251,8 +246,7 @@
 
             <div class="feedback-form" id="feedbackForm">
                 <label>Your Feedback</label>
-                <textarea id="fb-text" placeholder="Share your experience — waiting time, staff attitude, services quality, cleanliness..."></textarea>
-
+                <textarea id="fb-text" placeholder="Share your experience — waiting time, staff attitude, service quality, cleanliness..."></textarea>
                 <button class="submit-btn" onclick="submitFeedback()">Submit Feedback</button>
             </div>
 
@@ -343,7 +337,8 @@
                 if (typeQ === "gp" && !type.includes("gp") && !type.includes("clinic") && !type.includes("medical")) return false;
                 if (typeQ === "polyclinic" && !type.includes("polyclinic")) return false;
                 if (typeQ === "pharmacy" && !type.includes("pharmacy") && !type.includes("retail") && !type.includes("compounding")) return false;
-                if (typeQ === "specialist" && !type.includes("specialist") && !type.includes("opc") && !type.includes("specialist")) return false;
+                if (typeQ === "public hospital (a&e)" && !type.includes("hospital") && !type.includes("a&e")) return false;
+                if (typeQ === "private hospital (a&e)" && !type.includes("hospital") && !type.includes("a&e")) return false;
             }
 
             // Subsidy filter
@@ -461,11 +456,12 @@
     // =============================================
     // TABS
     // =============================================
-    function switchTab(name) {
+    function switchTab(event, name) {
         document.querySelectorAll(".tab-content").forEach(t => t.classList.remove("active"));
         document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
         document.getElementById("tab-" + name).classList.add("active");
-        event.target.classList.add("active");
+        const button = event.currentTarget || event.target;
+        if (button && button.classList) button.classList.add("active");
     }
 
     // =============================================
