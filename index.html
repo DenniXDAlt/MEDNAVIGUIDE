@@ -258,6 +258,10 @@
         </div>
     </div>
 
+    <!-- Firebase (feedback sync across devices) -->
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+
     <!-- Elfsight widget -->
     <script src="https://elfsightcdn.com/platform.js" async></script>
     <div class="elfsight-app-cc85d0a3-9ceb-4910-8313-9173d943393d" data-elfsight-app-lazy style="margin-top:30px;"></div>
@@ -465,6 +469,46 @@
     }
 
     // =============================================
+    // FIREBASE SETUP (feedback sync across devices)
+    // =============================================
+    // 1. Go to https://console.firebase.google.com -> Add project (free).
+    // 2. In the project, click the "</>" (Web app) icon to register a web app.
+    // 3. Copy the firebaseConfig object it gives you and paste it below, replacing this one.
+    // 4. In the left menu go to Build -> Firestore Database -> Create database (start in "test mode" is fine for a school project, or use the rules below).
+    // 5. In Firestore Rules tab, you can use:
+    //    rules_version = '2';
+    //    service cloud.firestore {
+    //      match /databases/{database}/documents {
+    //        match /reviews/{reviewId} {
+    //          allow read: if true;
+    //          allow create: if request.resource.data.text is string
+    //                        && request.resource.data.text.size() > 0
+    //                        && request.resource.data.text.size() < 1000;
+    //          allow update, delete: if false;
+    //        }
+    //      }
+    //    }
+    const firebaseConfig = {
+        apiKey: "AIzaSyBhXTx3dEESxKWWpzplv7Q-CsxRY6sQh4w",
+        authDomain: "mednaviguide.firebaseapp.com",
+        projectId: "mednaviguide",
+        storageBucket: "mednaviguide.firebasestorage.app",
+        messagingSenderId: "983541464988",
+        appId: "1:983541464988:web:b7f0698243b4612d775259",
+        measurementId: "G-0FC9MP89FK"
+    };
+
+    let db = null;
+    let firebaseReady = false;
+    try {
+        firebase.initializeApp(firebaseConfig);
+        db = firebase.firestore();
+        firebaseReady = true;
+    } catch (e) {
+        console.warn("Firebase not configured yet — feedback will only save on this device.", e);
+    }
+
+    // =============================================
     // FEEDBACK SYSTEM
     // =============================================
     let selectedRating = 0;
@@ -476,8 +520,9 @@
         });
     }
 
-    function submitFeedback() {
+    async function submitFeedback() {
         const text = document.getElementById("fb-text").value.trim();
+        const btn = document.querySelector("#feedbackForm .submit-btn");
 
         if (!text) { alert("Please write your feedback."); return; }
 
@@ -486,27 +531,42 @@
             date: new Date().toLocaleDateString("en-SG", {year:"numeric",month:"short",day:"numeric"})
         };
 
-        // Save to localStorage
-        const reviews = JSON.parse(localStorage.getItem("mednaviguide_reviews") || "[]");
-        reviews.unshift(review);
-        localStorage.setItem("mednaviguide_reviews", JSON.stringify(reviews.slice(0, 50)));
+        if (btn) { btn.disabled = true; btn.textContent = "Submitting..."; }
 
-        // Show success
-        document.getElementById("feedbackForm").style.opacity = "0.3";
-        const success = document.getElementById("feedbackSuccess");
-        success.style.display = "block";
+        try {
+            if (firebaseReady) {
+                // Save to Firestore so it syncs to every device
+                await db.collection("reviews").add({
+                    ...review,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+            } else {
+                // Fallback: this device only, until Firebase is configured
+                const reviews = JSON.parse(localStorage.getItem("mednaviguide_reviews") || "[]");
+                reviews.unshift(review);
+                localStorage.setItem("mednaviguide_reviews", JSON.stringify(reviews.slice(0, 50)));
+                renderReviews();
+            }
 
-        setTimeout(() => {
-            // Reset form
-            document.getElementById("fb-text").value = "";
-            document.getElementById("feedbackForm").style.opacity = "1";
-            success.style.display = "none";
-            renderReviews();
-        }, 2500);
+            // Show success
+            document.getElementById("feedbackForm").style.opacity = "0.3";
+            const success = document.getElementById("feedbackSuccess");
+            success.style.display = "block";
+
+            setTimeout(() => {
+                document.getElementById("fb-text").value = "";
+                document.getElementById("feedbackForm").style.opacity = "1";
+                success.style.display = "none";
+            }, 2500);
+        } catch (e) {
+            console.error("Failed to submit feedback:", e);
+            alert("Sorry, something went wrong submitting your feedback. Please try again.");
+        } finally {
+            if (btn) { btn.disabled = false; btn.textContent = "Submit Feedback"; }
+        }
     }
 
-    function renderReviews() {
-        const reviews = JSON.parse(localStorage.getItem("mednaviguide_reviews") || "[]");
+    function renderReviewsFromArray(reviews) {
         const list = document.getElementById("reviewsList");
 
         if (!reviews.length) {
@@ -520,6 +580,25 @@
                 <div class="review-text">${escapeHtml(r.text)}</div>
                 <div class="review-date">${r.date}</div>
             </div>`).join("");
+    }
+
+    function renderReviews() {
+        if (firebaseReady) {
+            // Live sync: this listener fires immediately with current data,
+            // then again automatically whenever anyone (on any device) adds feedback.
+            db.collection("reviews")
+                .orderBy("timestamp", "desc")
+                .limit(50)
+                .onSnapshot(snapshot => {
+                    const reviews = snapshot.docs.map(doc => doc.data());
+                    renderReviewsFromArray(reviews);
+                }, err => {
+                    console.error("Failed to load feedback:", err);
+                    renderReviewsFromArray(JSON.parse(localStorage.getItem("mednaviguide_reviews") || "[]"));
+                });
+        } else {
+            renderReviewsFromArray(JSON.parse(localStorage.getItem("mednaviguide_reviews") || "[]"));
+        }
     }
 
     function escapeHtml(text) {
